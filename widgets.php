@@ -60,12 +60,12 @@ class Imgs_Widget extends WP_Widget {
 
 				// Comnent loop
 				foreach ( $comments as $comment ) {
-                    // Skip comments belonging to other users if private comments enabled and current user is not admin
-                    if( get_field('private_comments', $post_id) && 
-                        !current_user_can('edit_posts') && 
-                        $comment->user_id != get_current_user_id()) { 
-                            continue;
-                    }
+	        // Skip comments belonging to other users if private comments enabled and current user is not admin
+	        if( get_field('private_comments', $post_id) &&
+	            !current_user_can('edit_posts') &&
+	            $comment->user_id != get_current_user_id()) {
+	                continue;
+	        }
 					$attachmentId =  get_comment_meta($comment->comment_ID, 'attachmentId', TRUE);
 					if(is_numeric($attachmentId) && !empty($attachmentId)){
 
