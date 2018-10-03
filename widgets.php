@@ -71,7 +71,7 @@ class Imgs_Widget extends WP_Widget {
 
 						// atachement info
 						$attachmentLink = wp_get_attachment_url($attachmentId);
-						$attachmentThumb = wp_get_attachment_image($attachmentId, ATT_TSIZE);
+						$attachmentThumb = wp_get_attachment_image($attachmentId, $size = 'thumbnail');
 						$real_path = get_attached_file( $attachmentId );
 						$imgs[] = array($attachmentLink,$attachmentThumb,$real_path);
 					}
