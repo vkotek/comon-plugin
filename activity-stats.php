@@ -1,7 +1,10 @@
-<?php 
+<?php
 header('Content-Type: text/html; charset=utf-8');
 $parse_uri = explode( 'wp-content', $_SERVER['SCRIPT_FILENAME'] );
 require_once( $parse_uri[0] . 'wp-load.php' );
+
+if ( !current_user_can('edit_posts') ) { exit('Unauthorized.'); }
+
 global $wpdb;
 
 $query_admin_ids = "
@@ -17,7 +20,7 @@ $query_mem_count = "
 	SELECT COUNT(*) as Amount
 	FROM wp_usermeta
 	WHERE wp_usermeta.meta_key = 'wp_user_level' AND wp_usermeta.meta_value != 10";
-	
+
 $mem_count = $wpdb->get_results($query_mem_count);
 
 // COUNT ACTIVE MEMBERS
@@ -43,8 +46,8 @@ $data_users = $wpdb->get_results($query_users);
 $query_posts = "
     SELECT ID, post_date, post_title
     FROM wp_posts
-    WHERE post_type = 'post' AND post_status = 'publish' 
-    ORDER BY ID 
+    WHERE post_type = 'post' AND post_status = 'publish'
+    ORDER BY ID
     ";
 $data_posts = $wpdb->get_results($query_posts);
 
@@ -63,7 +66,7 @@ tr.even {
     background-color: #ccc;
 }
 </style>
-</head> 
+</head>
 <body>
 <table>
 <tr class="header">
@@ -78,11 +81,11 @@ tr.even {
 <?php
     $x = 0;
     foreach( $data_users as $user) {
-    
+
         // Colorful even rows
         echo "<tr class=".( $x % 2 ? "even" : "odd" ).">";
         $x+=1;
-        
+
         printf("<td>%d</td><td>%s</td>",$user->id, $user->user_login);
         $total = "0";
         foreach( $data_posts as $post) {
@@ -98,10 +101,10 @@ tr.even {
         printf("<td><b>%d</b></td>",$total);
         print("</tr>");
     }
-  
-  
 
-  
+
+
+
 ?>
 <tr class="total">
 <td></td><td>SUM</td>
@@ -113,9 +116,9 @@ tr.even {
                     FROM `wp_comments`
                     WHERE comment_post_id = %d AND user_id NOT IN (".$query_admin_ids.")
                 ",$post->ID));
-        
+
             printf("<td><b>%d</b></td>",$sum[0]->count);
-            
+
         }
 ?>
 <td></td>

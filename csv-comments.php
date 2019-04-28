@@ -9,6 +9,8 @@ ini_set('display_errors', '1');
 require_once("../../../wp-load.php");
 
 define('comon-plugin', plugins_url()."/".dirname( plugin_basename( __FILE__ ) ) );
+if ( !current_user_can('edit_posts') ) { exit('Unauthorized.'); }
+
 
 
 // Get post id from URL, else shows all posts

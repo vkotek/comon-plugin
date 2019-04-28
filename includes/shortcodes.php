@@ -49,7 +49,7 @@ function comon_stats() {
 		";
     $mem_count_active = $wpdb->get_results($query_active_users);
 
-    printf('<iframe src="%s" class="iframe-stats" style="height: 550px;">Error loading iframe..</iframe>', zipfile_url."/statistics.php");
+    printf('<iframe src="%s" class="iframe-stats" style="height: 550px;">Error loading iframe..</iframe>', zipfile_url."/includes/statistics.php");
 
     printf('<b>Members:</b> %d / %d <small>[ filled in profile / all members ]</small><br>', $mem_count_active[0]->Amount, $mem_count[0]->Amount);
     printf( '<a href="%s">User activity table</a>', zipfile_url."/activity-stats.php" );

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: COM.ON plugin
  * Description: Includes customized latest posts widget and IMG zip download widget, as well as export function for Excel API.
- * Version: 2.0.0
+ * Version: 2.1.0
  * Author: Vojtech Kotek
  * Author URI: http://kotek.co
  * Author Email: kotek.vojtech@gmail.com
@@ -19,28 +19,35 @@
     - comon_expiry
     - user_comment_count
     - userMeta
+    - Custom API endpoints
  */
 
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 // define plugin url
-define('zipfile_url', plugins_url()."/".dirname( plugin_basename( __FILE__ ) ) );
+
+define( 'zipfile_url', plugins_url()."/".dirname( plugin_basename( __FILE__ ) ) );
+define( 'COMON_PLUGIN_VERSION', '2.1.0');
+define( 'COMON_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 
 function my_load_plugin_textdomain() {
   load_plugin_textdomain( 'comon-plugin', FALSE, basename( dirname( __FILE__ ) ) . '/languages/' );
 }
 add_action( 'plugins_loaded', 'my_load_plugin_textdomain' );
 
+include_once(ABSPATH .'wp-admin/includes/plugin.php');
 
 // Email settings functions
-include( plugin_dir_path( __FILE__ ) . 'emails.php');
+require plugin_dir_path( __FILE__ ) . 'includes/emails.php';
 
 // Shortcodes
-include( plugin_dir_path( __FILE__ ) . 'shortcodes.php');
+require plugin_dir_path( __FILE__ ) . 'includes/shortcodes.php';
 
 // Widgets
-include( plugin_dir_path( __FILE__ ) . 'widgets.php');
+require plugin_dir_path( __FILE__ ) . 'includes/widgets.php';
 
+// Custom REST API endpoints
+require plugin_dir_path( __FILE__ ) . 'includes/endpoints.php';
 
 /*
         _                ___                 _   _
@@ -86,7 +93,7 @@ function comon_data_filter() {
     // Get post info
 	$post_group = get_field('group');
 	$post_gender = get_field('gender');
-    $post_age = get_field('age');
+  $post_age = get_field('age');
 	$post_city = get_field('city');
 	$post_edu = get_field('education');
 
@@ -182,12 +189,11 @@ function userMeta($user_id) {
 	/* DEFAULT META */
 
 	// Gender
-    $user_gender = bp_get_profile_field_data('field=139&user_id='.$user_id);
-    $meta[] = get_text($user_gender);
+  $user_gender = bp_get_profile_field_data('field=139&user_id='.$user_id);
+  $user_gender = get_text($user_gender);
 
 	// Age
 	$user_age = bp_get_profile_field_data('field=142&user_id='.$user_id);
-	$meta[] = $user_age;
 
 	// City size
 	$user_city = bp_get_profile_field_data('field=256&user_id='.$user_id);
@@ -204,7 +210,6 @@ function userMeta($user_id) {
     default:
       $user_city = "N/A";
 	}
-	$meta[] = $user_city;
 
 	// Education level
 	$user_edu = bp_get_profile_field_data('field=186&user_id='.$user_id);
@@ -219,9 +224,7 @@ function userMeta($user_id) {
 		case "3":
 			$user_edu = "VS";
 			break;
-	} 
-
-	$meta[] = $user_edu;
+	}
 
 	/* CUSTOM META */
 
@@ -231,10 +234,23 @@ function userMeta($user_id) {
 	// $user_q{x} = bp_get_profile_field_data('field={y}&user_id='.$user_id);
 	// $meta[] = $user_q{x};
 
+  # Visible to Admins only
+  if ( current_user_can('edit_posts') && !current_user_can('edit_pages') ) {
+    $meta[] = $user_gender;
+  	$meta[] = $user_age;
+  	$meta[] = $user_city;
+    $meta[] = $user_edu;
+  }
+  # Visible to Client only
+  elseif ( current_user_can('edit_pages') ) {
+    $meta[] = $user_gender;
+  	$meta[] = $user_age;
+  	$meta[] = $user_city;
+    $meta[] = $user_edu;
+  }
 
     return(join(', ',$meta));
 }
-
 
 /* Stop Adding Functions Below this Line */
 ?>
